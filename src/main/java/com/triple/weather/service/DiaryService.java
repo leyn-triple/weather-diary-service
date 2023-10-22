@@ -2,30 +2,29 @@ package com.triple.weather.service;
 
 import com.triple.weather.entity.Diary;
 import com.triple.weather.repository.DiaryRepository;
-import lombok.RequiredArgsConstructor;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.jni.Local;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class DiaryService {
 
-    @Value("${openweathermap.key}")
-    private String apiKey;
-
     private final DiaryRepository diaryRepository;
+
+    private String apiKey = "754252797a69151c35f86f52161c1914";
 
     public void createDiary(LocalDate date, String text) {
 
@@ -43,10 +42,28 @@ public class DiaryService {
         nowDiary.setText(text);
         nowDiary.setDate(date);
         diaryRepository.save(nowDiary);
+
+    }
+
+    public List<Diary> readDiary(LocalDate date) {
+        //서비스에서 db를 조회하려면 레포지토리를 통해야 한다.
+        return diaryRepository.findAllByDate(date);
+    }
+
+    public List<Diary> readDiaries(LocalDate startDate, LocalDate endDate) {
+        //서비스에서 db를 조회하려면 레포지토리를 통해야 한다.
+        return diaryRepository.findAllByDateBetween(startDate, endDate);
+    }
+
+    public void updateDiary(LocalDate date, String text) {
+        Diary nowDiary = diaryRepository.getFirstByDate(date);
+        nowDiary.setText(text);
+        diaryRepository.save(nowDiary);
     }
 
     private String getWeatherString() {
         String apiUrl = "https://api.openweathermap.org/data/2.5/weather?q=seoul&appid=" + apiKey;
+
         try {
             URL url = new URL(apiUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -68,6 +85,7 @@ public class DiaryService {
         }catch (Exception e) {
             return "failed to get response";
         }
+
     }
 
     private Map<String, Object> parseWeather(String jsonString) {

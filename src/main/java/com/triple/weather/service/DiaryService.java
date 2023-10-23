@@ -11,29 +11,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.jni.Local;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
+
 
 @RequiredArgsConstructor
+
 @Service
 public class DiaryService {
 
     private final DiaryRepository diaryRepository;
 
     private String apiKey = "754252797a69151c35f86f52161c1914";
-
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public void createDiary(LocalDate date, String text) {
-
         // open weather map에서 날씨 데이터 가져오기
         String weatherData = getWeatherString();
-
         //받아온 날씨 json 파싱하기
         Map<String, Object> parseWeather = parseWeather(weatherData);
-
         //파싱된 데이터 + 일기 값 우리 db에 넣기
         Diary nowDiary = new Diary();
         nowDiary.setWeather(parseWeather.get("main").toString());
@@ -44,12 +44,12 @@ public class DiaryService {
         diaryRepository.save(nowDiary);
 
     }
-
+    @Transactional(readOnly = true)
     public List<Diary> readDiary(LocalDate date) {
         //서비스에서 db를 조회하려면 레포지토리를 통해야 한다.
         return diaryRepository.findAllByDate(date);
     }
-
+    @Transactional(readOnly = true)
     public List<Diary> readDiaries(LocalDate startDate, LocalDate endDate) {
         //서비스에서 db를 조회하려면 레포지토리를 통해야 한다.
         return diaryRepository.findAllByDateBetween(startDate, endDate);

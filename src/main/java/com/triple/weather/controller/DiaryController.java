@@ -19,7 +19,8 @@ public class DiaryController {
      *날짜에 따른 일기 생성
      */
     @PostMapping("/create/diary")
-    void createDiary(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestBody String text) {
+    void createDiary(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                     @RequestBody String text) {
         diaryService.createDiary(date, text);
     }
 
@@ -44,7 +45,8 @@ public class DiaryController {
      *이미 쓴 일기 수정
      */
     @PutMapping("/update/diary")
-    void updateDiary(@RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date, @RequestBody String text) {
+    void updateDiary(@RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date,
+                     @RequestBody String text) {
         diaryService.updateDiary(date, text);
     }
 

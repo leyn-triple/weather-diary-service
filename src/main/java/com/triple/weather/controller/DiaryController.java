@@ -1,12 +1,14 @@
 package com.triple.weather.controller;
 
 import com.triple.weather.entity.Diary;
+import com.triple.weather.error.InvalidDate;
 import com.triple.weather.service.DiaryService;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -29,6 +31,9 @@ public class DiaryController {
      */
     @GetMapping("/read/diary")
     List<Diary> readDiary(@RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
+//        if (date.isAfter(LocalDate.ofYearDay(3050, 1))) {
+//            throw new InvalidDate();
+//        }
         return diaryService.readDiary(date);
     }
 
@@ -57,5 +62,9 @@ public class DiaryController {
     void deleteDiary(@RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate date) {
         diaryService.deleteDiary(date);
     }
+
+    /**
+     * 예외처리
+     */
 
 }

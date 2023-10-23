@@ -3,6 +3,7 @@ package com.triple.weather.service;
 import com.triple.weather.WeatherDiaryServiceApplication;
 import com.triple.weather.entity.DateWeather;
 import com.triple.weather.entity.Diary;
+import com.triple.weather.error.InvalidDate;
 import com.triple.weather.repository.DateWeatherRepository;
 import com.triple.weather.repository.DiaryRepository;
 import java.io.BufferedReader;
@@ -14,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jdk.vm.ci.meta.Local;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -36,11 +36,10 @@ public class DiaryService {
 
     private final DiaryRepository diaryRepository;
     private final DateWeatherRepository dateWeatherRepository;
-    private static final Logger logger = LoggerFactory.getLogger(WeatherDiaryServiceApplication.class);
+    //private static final Logger logger = LoggerFactory.getLogger(WeatherDiaryServiceApplication.class);
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void createDiary(LocalDate date, String text) {
-        logger.info("started to create diary");
 
         //날씨 데이터 가져오기 (API에서 가져오기 or DB에서 가져오기
         DateWeather dateWeather = getDateWeather(date);
@@ -50,8 +49,6 @@ public class DiaryService {
         nowDiary.setText(text);
         nowDiary.setDate(date);
         diaryRepository.save(nowDiary);
-
-        logger.info("end to create diary");
 
         /*open weather map에서 날씨 데이터 가져오기
         String weatherData = getWeatherString();
@@ -149,7 +146,6 @@ public class DiaryService {
 
     @Transactional(readOnly = true)
     public List<Diary> readDiary(LocalDate date) {
-        logger.debug("read diary");
         //서비스에서 db를 조회하려면 레포지토리를 통해야 한다.
         return diaryRepository.findAllByDate(date);
     }

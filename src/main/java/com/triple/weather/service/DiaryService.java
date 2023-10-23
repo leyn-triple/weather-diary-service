@@ -1,5 +1,6 @@
 package com.triple.weather.service;
 
+import com.triple.weather.WeatherDiaryServiceApplication;
 import com.triple.weather.entity.DateWeather;
 import com.triple.weather.entity.Diary;
 import com.triple.weather.repository.DateWeatherRepository;
@@ -19,6 +20,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -29,14 +32,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class DiaryService {
 
-    private final DiaryRepository diaryRepository;
-    private final DateWeatherRepository dateWeatherRepository;
-
     private String apiKey = "754252797a69151c35f86f52161c1914";
 
+    private final DiaryRepository diaryRepository;
+    private final DateWeatherRepository dateWeatherRepository;
+    private static final Logger logger = LoggerFactory.getLogger(WeatherDiaryServiceApplication.class);
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void createDiary(LocalDate date, String text) {
+        logger.info("started to create diary");
 
         //날씨 데이터 가져오기 (API에서 가져오기 or DB에서 가져오기
         DateWeather dateWeather = getDateWeather(date);
@@ -46,6 +50,8 @@ public class DiaryService {
         nowDiary.setText(text);
         nowDiary.setDate(date);
         diaryRepository.save(nowDiary);
+
+        logger.info("end to create diary");
 
         /*open weather map에서 날씨 데이터 가져오기
         String weatherData = getWeatherString();
@@ -143,6 +149,7 @@ public class DiaryService {
 
     @Transactional(readOnly = true)
     public List<Diary> readDiary(LocalDate date) {
+        logger.debug("read diary");
         //서비스에서 db를 조회하려면 레포지토리를 통해야 한다.
         return diaryRepository.findAllByDate(date);
     }
